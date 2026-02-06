@@ -3,3 +3,10 @@ title: "Code_projet"
 format: html
 ---
 
+```{r}
+donnees <- readRDS("stu_qqq.rds")
+```
+
+```{r}
+str(donnees)
+```
