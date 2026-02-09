@@ -35,7 +35,7 @@ variables_final <- data.frame(ST347Q01JA = donnees$ST347Q01JA, #ordi
                               ST295Q04JA = donnees$ST295Q04JA, #travailler 30 derniers jours
                               ST295Q05JA = donnees$ST295Q05JA, #travailler 30 derniers jours
                               ST307Q07JA = donnees$ST307Q07JA, #arrete devoir si trop long
-                              ST345Q02JA = donnees$ST345Q02JA, #more relax than people
+                              ST345Q02JA = donnees$ST345Q02JA, #more relax than people,
                               
                               
                               ST347Q01JA = donnees$ST347Q01JA,
