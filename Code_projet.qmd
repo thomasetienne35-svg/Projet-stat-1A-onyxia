@@ -4,6 +4,12 @@ format: html
 ---
 
 ```{r}
+library(ggplot2)
+library(dplyr)
+library(scales)
+```
+
+```{r}
 donnees <- readRDS("stu_qqq.rds")
 ```
 
@@ -16,5 +22,87 @@ variables_final <- data.frame()
 ```
 
 ```{r}
-variables_final <- data.frame(ST347Q01JA = donnees$ST347Q01JA)
+variables_final <- data.frame(ST347Q01JA = donnees$ST347Q01JA, #ordi
+                              ST250Q02JA = donnees$ST250Q02JA, #chambre
+                              ST259Q01JA = donnees$ST259Q01JA, #note famille
+                              ST260Q01JA = donnees$ST260Q01JA, #redoubler primaire
+                              ST260Q02JA = donnees$ST260Q02JA, #redoubler collège
+                              ST260Q03JA = donnees$ST260Q03JA, #redoubler lycée
+                              ST062Q01TA = donnees$ST062Q01TA, #manquer 3 mois cours pri
+                              ST062Q02TA = donnees$ST062Q02TA, #manquer 3 mois cours collège
+                              ST062Q03TA = donnees$ST062Q03TA, #manquer 3 mois cours lycée
+                              ST295Q02JA = donnees$ST295Q02JA, #etudier sur 30 derniers jours
+                              ST295Q04JA = donnees$ST295Q04JA, #travailler 30 derniers jours
+                              ST295Q05JA = donnees$ST295Q05JA, #travailler 30 derniers jours
+                              ST307Q07JA = donnees$ST307Q07JA, #arrete devoir si trop long
+                              ST345Q02JA = donnees$ST345Q02JA, #more relax than people
+                              
+                              
+                              ST347Q01JA = donnees$ST347Q01JA,
+                              ST350Q01JA = donnees$ST350Q01JA
+                              )
+```
+
+```{r}
+var_final_clean <- na.omit(variables_final)
+```
+
+```{r}
+donnees_graph <- var_final_clean %>%
+  # Sélection des variables
+  select(Fermeture = ST347Q01JA, Apprentissage = ST350Q01JA) %>%
+  
+  # Nettoyage : On enlève les valeurs manquantes (NA)
+  na.omit() %>%
+  
+  # Renommer les codes par des labels lisibles (selon le PDF)
+  mutate(
+    Fermeture = factor(Fermeture, 
+                       levels = c(1, 2, 3, 4, 5, 6),
+                       labels = c("Non", "Jusqu'à 1 mois", "1-3 mois", 
+                                  "3-6 mois", "6-12 mois", "> 1 an")),
+    Apprentissage = factor(Apprentissage,
+                           levels = c(1, 2, 3),
+                           labels = c("J'ai appris MOINS", 
+                                      "J'ai appris AUTANT", 
+                                      "J'ai appris PLUS"))
+  ) %>%
+  
+  # Calcul des pourcentages pour le graphique
+  count(Fermeture, Apprentissage) %>%
+  group_by(Fermeture) %>%
+  mutate(Pourcentage = n / sum(n))
+
+# 3. Création du graphique
+ggplot(donnees_graph, aes(x = Fermeture, y = Pourcentage, fill = Apprentissage)) +
+  
+  # Création des barres
+  geom_bar(stat = "identity", position = "fill", width = 0.7) +
+  
+  # Ajout des étiquettes de pourcentage
+  geom_text(aes(label = percent(Pourcentage, accuracy = 1)), 
+            position = position_fill(vjust = 0.5), 
+            color = "white", size = 3.5, fontface = "bold") +
+  
+  # Couleurs personnalisées (Rouge pour "Moins", Gris pour "Autant", Bleu pour "Plus")
+  scale_fill_manual(values = c("#D9534F", "#999999", "#5BC0DE")) +
+  
+  # Mise en forme de l'axe Y en pourcentage
+  scale_y_continuous(labels = scales::percent) +
+  
+  # Titres et légendes
+  labs(
+    title = "Impact de la durée de fermeture sur l'apprentissage perçu",
+    subtitle = "Question PISA : Comparé à l'école en présentiel, combien avez-vous appris ?",
+    x = "Durée de fermeture de l'école du au COVID (ST347)",
+    y = "Proportion d'élèves",
+    fill = "Ressenti (ST350)"
+  ) +
+  
+  # Thème épuré
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    axis.text.x = element_text(angle = 45, hjust = 1) # Rotation des étiquettes X
+  )
 ```
