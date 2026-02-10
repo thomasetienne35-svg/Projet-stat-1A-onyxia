@@ -6,10 +6,6 @@ format: html
 # Library
 
 ```{r}
-install.packages(c("FactoMineR", "factoextra"))
-
-library(FactoMineR)
-library(factoextra)
 library(ggplot2)
 library(dplyr)
 library(scales)
@@ -178,7 +174,6 @@ ggplot(donnees_graph, aes(x = Fermeture, y = Pourcentage, fill = Apprentissage))
   labs(
     title = "Impact de la fermeture des écoles sur l'apprentissage",
     subtitle = "Perception des élèves comparée aux cours en présentiel",
-    caption = stringr::str_wrap("Note de lecture: Dans les écoles qui on été fermées durant  moins d'un mois dû au covid, 56% pourcent des élèves considère avoir moins appris que en présentiel, 33% autant et 11% mieux.", width = 100),
     x = NULL, # On enlève le titre X car les labels "1-3 mois" sont explicites
     y = NULL, # On enlève le titre Y car les % sont explicites
     fill = NULL # On enlève le titre de la légende
@@ -187,27 +182,24 @@ ggplot(donnees_graph, aes(x = Fermeture, y = Pourcentage, fill = Apprentissage))
   # Thème Minimaliste
   theme_minimal(base_size = 12) +
   theme(
-    
     # Suppression des éléments inutiles
     panel.grid.major.x = element_blank(), # Pas de lignes verticales
     panel.grid.minor = element_blank(),   # Pas de petites lignes
     panel.grid.major.y = element_line(color = "grey90"), # Lignes horizontales très discrètes
     
     # Gestion de la légende
-    legend.position = "top", 
+    legend.position = "bottom", 
     legend.justification = "left",
     legend.margin = margin(t = 0, b = 0),
     
     # Gestion des titres
     plot.title.position = "plot", # Aligne le titre sur l'image entière
     plot.title = element_text(face = "bold", size = 16, color = "#333333"),
-    plot.caption = element_text(hjust=0, color = "#666666" ),
     plot.subtitle = element_text(size = 12, color = "#666666", margin = margin(b = 20)),
     
-    plot.margin = margin(t = 0.5, r = 0.5, b = 1, l = 0.5, "cm"),
     # Gestion des axes
     axis.text.x = element_text(color = "black", margin = margin(t = 5)),
-    axis.text.y = element_text(color = "black")
+    axis.text.y = element_text(color = "grey60")
   )
 ```
 
@@ -223,41 +215,3 @@ test_chi2 <- chisq.test(table(var_final_clean$ST347Q01JA, var_final_clean$ST350Q
 print(test_chi2)
 ```
 
-# ACM
-
-```{r}
-str(var_final_clean)
-```
-
-Variable type num, besoin convertir en type factor pour ACM
-
-```{r}
-cols_a_convertir <- c(1:16) 
-var_final_clean[, cols_a_convertir] <- lapply(var_final_clean[, cols_a_convertir], as.factor)
-```
-
-```{r}
-res.mca <- MCA(var_final_clean, graph = FALSE)
-print(res.mca)
-```
-
-```{r}
-# Visualiser l'éboulis des valeurs propres
-fviz_eig(res.mca, addlabels = TRUE, ylim = c(0, 15))
-```
-
-```{r}
-# Carte des variables (les catégories)
-fviz_mca_var(res.mca, 
-             choice = "mca.cor", # Correlation entre variables et axes
-             repel = TRUE,       # Évite le chevauchement de texte
-             ggtheme = theme_minimal())
-```
-
-```{r}
-fviz_mca_ind(res.mca, 
-             axes = c(1,2),
-             col.ind = "cos2", # Qualité de représentation
-             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
-             repel = TRUE)
-```
