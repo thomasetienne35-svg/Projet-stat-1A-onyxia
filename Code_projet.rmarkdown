@@ -214,3 +214,4 @@ print("--- RÉSULTAT DU TEST CHI-DEUX ---")
 test_chi2 <- chisq.test(table(var_final_clean$ST347Q01JA, var_final_clean$ST350Q01JA))
 print(test_chi2)
 ```
+
