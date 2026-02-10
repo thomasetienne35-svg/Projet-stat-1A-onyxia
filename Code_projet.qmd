@@ -228,8 +228,8 @@ str(var_final_clean)
 Variable type num, besoin convertir en type factor pour ACM
 
 ```{r}
-cols_a_convertir <- c(1:16) 
-var_final_clean[, cols_a_convertir] <- lapply(var_final_clean[, cols_a_convertir], as.factor)
+cols_a_convertir <- c(1:85) 
+variables_final[, cols_a_convertir] <- lapply(variables_final[, cols_a_convertir], as.factor)
 ```
 
 ```{r}
