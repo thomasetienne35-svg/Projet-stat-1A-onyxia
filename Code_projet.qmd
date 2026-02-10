@@ -13,6 +13,7 @@ library(factoextra)
 library(ggplot2)
 library(dplyr)
 library(scales)
+library(corrplot)
 
 ```
 
@@ -270,5 +271,28 @@ abline(h = deciles_satisfaction, col = "red", lty = 2, lwd = 0.5) #ajout des dé
 deciles_implication <- quantile(donnees$ST331Q03JA, probs = c(0.1, 0.9), na.rm = T)
 boxplot(donnees$ST331Q03JA, main = "Boxplot avec déciles de l'effort mis dans les réponses au questionnaire", ylab = "évaluation niveau d'implication réponse au questionaire")
 abline(h = deciles_implication, col = "red", lty = 2, lwd = 0.5)
+```
+# Matrice de Corrélation
+```{r}
+
+cor_matrice <- cor(variables_final, use = "pairwise.complete.obs") #use = "pairwise.complete.obs" permet de prendre les élèves qui ont répondus à la fois à A et
+# B si on fait la corrélation entre A et B, mais ne regarde pas si il a répondu à C, D etc...
+seuil_corr <- 0.3
+
+# 1. On fait une copie propre
+cor_matrice_filtree <- cor_matrice
+
+# 2. On calcule la condition (vrai si la corrélation est faible)
+condition_faible <- abs(cor_matrice) < seuil_corr
+
+# 3. L'ÉTAPE CRUCIALE : On gère les NA existants
+# On dit : "Si on ne sait pas (NA), alors on ne touche pas (FALSE)"
+condition_faible[is.na(condition_faible)] <- FALSE
+
+# 4. Maintenant on peut appliquer le filtre sans risque
+cor_matrice_filtree[condition_faible] <- NA
+
+corrplot(cor_matrice_filtree, type = "lower", tl.cex = 0.8)  
+
 ```
 
