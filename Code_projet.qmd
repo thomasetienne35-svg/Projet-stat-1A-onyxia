@@ -115,7 +115,7 @@ variables_final <- data.frame(ST347Q01JA = donnees$ST347Q01JA, #ordi
                               ST356Q01JA = donnees$ST356Q01JA, # sentiment de préparation pour apprendre seul si fermeture prolongée dans le futur REPONSE CHOIX MULTIPLE
                               ST331Q01JA = donnees$ST331Q01JA, # effort fourni pour réussir le test PISA
                               ST331Q02JA = donnees$ST331Q02JA, # effort qui aurait été fourni si le test comptait pour les notes scolaires
-                              ST331Q03JA = donnees$ST331Q03JA, # effort fourni pour répondre correctement au questionnaire
+                              ST331Q03JA = donnees$ST331Q03JA, # effort fourni pour répondre correctement au questionnairee
 
                               
 
