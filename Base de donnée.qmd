@@ -1,0 +1,92 @@
+---
+title: "Base de donnée"
+format: html
+---
+
+```{r}
+rm(list=ls())
+```
+
+```{r}
+donnees <- readRDS("stu_qqq.rds")
+```
+
+```{r}
+variables_finales<- data.frame()
+```
+
+```{r}
+variables_finales <- data.frame(ST004Q01TA = donnees$ST004Q01TA, #Sexe
+                              
+		                          ICTRES = donnees$ICTRES,#ICT Resources 
+                              FEELLAH = donnees$FEELLAH,#Feelings about learning at home (WLE)
+                              SDLEFF = donnees$SDLEFF,#Self-directed learning self-efficacy
+                              LIFESAT = donnees$LIFESAT,#Students' Life Satisfaction across Domains
+                              PROBSELF = donnees$PROBSELF,#Problems with self-directed learning 
+                              LEARRES = donnees$LEARRES, #Types of learning resources used while school was closed
+                              ICTAVHOM = donnees$ICTAVHOM,#Availability and Usage of ICT at Home 
+                              
+                              COGACRCO = donnees$COGACRCO,#Cognitive activation in mathematics
+                              COGACMCO = donnees$COGACMCO,#Cognitive activation in mathematics
+                              EXPOFA = donnees$EXPOFA,#Exposure to Formal and Applied Mathematics Tasks
+                              EXPO21ST = donnees$EXPO21ST,#Exposure to Mathematical Reasoning(algorithmique)
+                              MATHEFF = donnees$MATHEFF,#Mathematics self-efficacy
+                              MATHEF21 = donnees$MATHEF21,#Mathematics self-efficacy 21st
+                              
+                              
+                              
+                              
+                              ST347Q01JA = donnees$ST347Q01JA, #fermeture à cause du Convid-19
+                             
+                            
+                              ST348Q02JA = donnees$ST348Q02JA, #quelqu'un de ton ecole t’envoyait des travaux scolaires
+                              ST348Q03JA = donnees$ST348Q03JA, #quelqu'un de ton ecole a mis en ligne des supports sur une plateforme d’apprentissage ou une plateforme scolaire
+                             
+                              ST348Q08JA = donnees$ST348Q08JA,  #quelqu'un de ton ecole a pris de tes nouvelles pour savoir comment tu te sentais
+                                                          
+                              ST351Q01JA = donnees$ST351Q01JA, # utilisation de manuels et feuilles papier
+                              ST351Q02JA = donnees$ST351Q02JA, # utilisation de manuels et supports numériques
+                              ST351Q03JA = donnees$ST351Q03JA, # cours en direct par un enseignant (visioconférence)
+                             
+                           
+                              ST351Q06JA = donnees$ST351Q06JA, # cours enregistrés fournis par l’école
+                         
+
+                         
+                              ST353Q01JA = donnees$ST353Q01JA, # aide familiale pour les devoirs
+                            
+                              ST353Q08JA = donnees$ST353Q08JA, # enseignement de sujets supplémentaires
+                              ST354Q01JA = donnees$ST354Q01JA, # sentiment de solitude
+                              ST354Q02JA = donnees$ST354Q02JA, # plaisir d'apprendre seul
+                              ST354Q03JA = donnees$ST354Q03JA, # enseignants disponibles pour aider
+                              ST354Q04JA = donnees$ST354Q04JA, # anxiété liée au travail scolaire
+                              ST354Q05JA = donnees$ST354Q05JA, # motivation à apprendre
+                              ST354Q06JA = donnees$ST354Q06JA, # retard scolaire ressenti
+                              ST354Q07JA = donnees$ST354Q07JA, # amélioration des compétences numériques
+                              ST354Q08JA = donnees$ST354Q08JA # enseignants bien préparés pour l’enseignement à distance
+
+                              
+                              
+                              
+                              )
+```
+
+```{r}
+colonnes_a_garder <- c(
+  #"ST004Q01TA", 
+  "ICTRES", "FEELLAH", "SDLEFF", "LIFESAT", 
+  "PROBSELF", "LEARRES", "ICTAVHOM", "COGACRCO", "COGACMCO", 
+  "EXPOFA", "EXPO21ST", "MATHEFF", "MATHEF21", "ST347Q01JA", 
+  "ST348Q02JA", "ST348Q03JA", "ST348Q08JA", "ST351Q01JA", 
+  "ST351Q02JA", "ST351Q03JA", "ST351Q06JA", "ST353Q01JA", 
+  "ST353Q08JA", "ST354Q01JA", "ST354Q02JA", "ST354Q03JA", 
+  "ST354Q04JA", "ST354Q05JA", "ST354Q06JA", "ST354Q07JA", 
+  "ST354Q08JA"
+)
+
+variables_finales <- donnees[, colonnes_a_garder]
+```
+
+```{r}
+colonnes_a_garder[!colonnes_a_garder %in% colnames(donnees)]
+```
