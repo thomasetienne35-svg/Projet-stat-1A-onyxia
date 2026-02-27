@@ -3,3 +3,112 @@ title: "Partie_1_2"
 format: html
 ---
 
+```{r}
+library(dplyr)
+```
+
+```{r}
+library(ggplot2)
+
+donnees_propres <- variables_finales %>%
+  filter(ST347Q01JA %in% 1:6)
+
+# 2. Création du graphique
+ggplot(donnees_propres, 
+       aes(x = as.factor(ST347Q01JA), y = SCORE_MATH_MOYEN, fill = as.factor(ST347Q01JA))) +
+  
+  # Ajoute les tirets aux extrémités des moustaches
+  stat_boxplot(geom = "errorbar", width = 0.2, color = "black") + 
+  
+  # Le boxplot avec des valeurs extrêmes (outliers) en forme de cercles vides
+  geom_boxplot(color = "black", outlier.shape = 1) + 
+  
+  # Tes 6 nouvelles étiquettes ultra-courtes
+  scale_x_discrete(labels = c("1" = "Jamais", 
+                              "2" = "< 1 mois", 
+                              "3" = "1-3 mois", 
+                              "4" = "3-6 mois",
+                              "5" = "6-12 mois",
+                              "6" = "> 12 mois")) +
+  
+  # Un beau dégradé de 6 nuances de bleu, du plus clair au plus foncé
+  scale_fill_manual(values = c("aliceblue", "lightblue", "skyblue", 
+                               "dodgerblue", "royalblue", "midnightblue")) +
+  
+  # Titres et axes
+  labs(title = "Distributions des scores en mathématiques selon la durée de fermeture \n de l'école",
+       x = "Durée de fermeture de l'école du au COVID",
+       y = "Score en mathématiques") +
+  
+  # Esthétique épurée façon publication académique
+  theme_minimal() +
+  theme(panel.background = element_rect(fill = "gray85", color = NA), legend.position = "none") # Retire les lignes verticales de fond
+```
+
+```{r}
+# On s'assure d'avoir notre base propre filtrée
+donnees_propres <- variables_finales %>% filter(ST347Q01JA %in% 1:6)
+
+# 1. On lance l'ANOVA
+modele_anova <- aov(SCORE_MATH_MOYEN ~ as.factor(ST347Q01JA), data = donnees_propres)
+
+# 2. On affiche le tableau de l'ANOVA pour voir la p-value
+summary(modele_anova)
+
+# 3. Calcul manuel et propre du rapport de corrélation Eta-carré
+# On extrait la table de l'ANOVA
+tableau_anova <- summary(modele_anova)[[1]]
+
+# Somme des carrés inter-classes (Expliquée)
+SS_inter <- tableau_anova$`Sum Sq`[1] 
+
+# Somme des carrés intra-classe (Résiduelle)
+SS_intra <- tableau_anova$`Sum Sq`[2]
+
+# Eta-carré = SS_inter / (SS_inter + SS_intra)
+eta_carre <- SS_inter / (SS_inter + SS_intra)
+
+print(paste("Le rapport de corrélation Eta-carré est de :", round(eta_carre, 4)))
+```
+
+```{r}
+med1 <- median(donnees_propres$SCORE_MATH_MOYEN[donnees_propres$ST347Q01JA == 3], na.rm = TRUE)
+med1
+```
+
+```{r}
+donnees_repartition <- variables_finales %>%
+  filter(ST347Q01JA %in% 1:6) %>%         # On garde uniquement les 6 vraies modalités
+  count(ST347Q01JA) %>%                   # On compte les effectifs (n)
+  mutate(pourcentage = n / sum(n) * 100)  # On calcule le pourcentage
+
+# 2. Création du diagramme en barres
+ggplot(donnees_repartition, aes(x = as.factor(ST347Q01JA), y = pourcentage)) +
+  
+  # Les barres (on utilise une couleur unie élégante comme 'steelblue')
+  geom_bar(stat = "identity", fill = "lightblue", color = "black") +
+  
+  # Affichage du pourcentage exact au-dessus de chaque barre
+  geom_text(aes(label = paste0(round(pourcentage, 1), "%")), 
+            vjust = -0.8, size = 4, fontface = "bold") +
+  
+  # Les étiquettes de l'axe X (les mêmes que pour ton boxplot !)
+  scale_x_discrete(labels = c("1" = "Jamais", 
+                              "2" = "< 1 mois", 
+                              "3" = "1-3 mois", 
+                              "4" = "3-6 mois",
+                              "5" = "6-12 mois",
+                              "6" = "> 12 mois")) +
+  
+  # On repousse un peu la limite de l'axe Y vers le haut pour que le texte ne soit pas coupé
+  scale_y_continuous(limits = c(0, max(donnees_repartition$pourcentage) + 10)) +
+  
+  # Titres et axes
+  labs(title = "Répartition des élèves selon la durée de fermeture de leur école",
+       x = "Durée de fermeture liée au COVID",
+       y = "Proportion d'élèves (%)") +
+  
+  # Esthétique épurée
+  theme_minimal() +
+  theme(panel.background = element_rect(fill = "gray85", color = NA), legend.position = "none")
+```
