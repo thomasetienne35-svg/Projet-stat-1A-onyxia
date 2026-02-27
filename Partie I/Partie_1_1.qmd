@@ -1,0 +1,108 @@
+---
+title: "Partie_1_1"
+format: html
+---
+
+```{r}
+install.packages("moments")
+library(moments)
+```
+
+```{r}
+boxplot(variables_finales$COGACRCO, variables_finales$COGACMCO,
+        main = "Distribution des scores en Mathématiques",
+        col = c("lightblue", "lightcoral"),
+        border = "black")
+```
+
+```{r}
+hist(variables_finales$COGACRCO,
+     main = "Distribution des scores WLE en Mathématiques", 
+     xlab = "Score standardisé (WLE)", 
+     ylab = "Fréquence (Nombre d'élèves)", 
+     col = "lightblue",
+     border = "white",
+     breaks = 30)
+```
+
+```{r}
+# Charger le package
+library(ggplot2)
+
+# Histogramme avec courbe de densité superposée
+ggplot(data =variables_finales, aes(x = SCORE_MATH_MOYEN)) +
+  # 1. L'histogramme (on met aes(y = ..density..) pour que l'échelle corresponde à la courbe)
+  geom_histogram(aes(y = ..density..), 
+                 bins = 30, # Nombre de classes/barres
+                 fill = "lightblue", 
+                 color = "black") + # Alpha gère la transparence
+
+  # 3. Ajouter une ligne verticale pour la moyenne (Optionnel mais très classe)
+  geom_vline(aes(xintercept = mean(SCORE_MATH_MOYEN, na.rm = TRUE)), 
+             color = "red", linetype = "dashed", size = 1) +
+  # 4. Esthétique du graphique
+  labs(title = "Distribution des performances en Mathématiques",
+       x = "Valeur plosible du niveau en maths ",
+       y = "Densité") +
+  theme_minimal()
+```
+
+```{r}
+sum(!is.na(variables_finales$SCORE_MATH_MOYEN))
+mean(variables_finales$SCORE_MATH_MOYEN, na.rm = TRUE)
+
+median(variables_finales$SCORE_MATH_MOYEN, na.rm = TRUE)
+deciles <- quantile(variables_finales$SCORE_MATH_MOYEN, probs = c(0.1, 0.5, 0.9), na.rm = TRUE)
+print(deciles[3])
+print(deciles[1])
+print(deciles[2])
+
+print((deciles[3] - deciles[1])/deciles[2])
+
+asymetrie <- skewness(variables_finales$SCORE_MATH_MOYEN, na.rm = TRUE)
+print(paste("Coefficient d'asymétrie :", round(asymetrie, 3)))
+
+
+aplatissement <- kurtosis(variables_finales$SCORE_MATH_MOYEN, na.rm = TRUE)
+print(paste("Coefficient d'aplatissement :", round(aplatissement, 3)))
+```
+
+```{r}
+sum(!is.na(variables_finales$COGACMCO))
+mean(variables_finales$COGACMCO, na.rm = TRUE)
+
+median(variables_finales$COGACMCO, na.rm = TRUE)
+deciles <- quantile(variables_finales$COGACMCO, probs = c(0.1, 0.5, 0.9), na.rm = TRUE)
+print(deciles[3])
+print(deciles[1])
+print(deciles[2])
+
+print((deciles[3] - deciles[1])/deciles[2])
+
+asymetrie <- skewness(variables_finales$COGACMCO, na.rm = TRUE)
+print(paste("Coefficient d'asymétrie :", round(asymetrie, 3)))
+
+
+aplatissement <- kurtosis(variables_finales$COGACMCO, na.rm = TRUE)
+print(paste("Coefficient d'aplatissement :", round(aplatissement, 3)))
+```
+
+```{r}
+sum(!is.na(variables_finales$COGACMCO))
+mean(variables_finales$COGACMCO, na.rm = TRUE)
+
+median(variables_finales$COGACMCO, na.rm = TRUE)
+deciles <- quantile(variables_finales$COGACMCO, probs = c(0.1, 0.5, 0.9), na.rm = TRUE)
+print(deciles[3])
+print(deciles[1])
+print(deciles[2])
+
+print((deciles[3] - deciles[1])/deciles[2])
+
+asymetrie <- skewness(variables_finales$COGACMCO, na.rm = TRUE)
+print(paste("Coefficient d'asymétrie :", round(asymetrie, 3)))
+
+
+aplatissement <- kurtosis(variables_finales$COGACMCO, na.rm = TRUE)
+print(paste("Coefficient d'aplatissement :", round(aplatissement, 3)))
+```

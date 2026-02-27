@@ -4,7 +4,7 @@ format: html
 ---
 
 ```{r}
-rm(list=ls())
+rm(list=ls()) 
 ```
 
 ```{r}
@@ -88,5 +88,19 @@ variables_finales <- donnees[, colonnes_a_garder]
 ```
 
 ```{r}
-colonnes_a_garder[!colonnes_a_garder %in% colnames(donnees)]
+str(variables_finales)
+```
+
+```{r}
+df_propre <- na.omit(variables_finales)
+```
+
+```{r}
+df_pv_math_global <- donnees %>%
+  select(PV1MATH, PV2MATH, PV3MATH, PV4MATH, PV5MATH, 
+         PV6MATH, PV7MATH, PV8MATH, PV9MATH, PV10MATH)
+```
+
+```{r}
+variables_finales$SCORE_MATH_MOYEN <- rowMeans(df_pv_math_global, na.rm = TRUE)
 ```
