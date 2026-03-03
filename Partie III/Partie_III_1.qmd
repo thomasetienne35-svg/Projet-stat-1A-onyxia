@@ -3,3 +3,150 @@ title: "Partie_III_1"
 format: html
 ---
 
+```{r}
+donnees <- readRDS("donnees_PS_triees.rds")
+```
+
+```{r}
+install.packages("corrplot")
+library(dplyr)
+library(corrplot)
+```
+
+
+```{r}
+# ==============================================================================
+# PARTIE III.1 : BIEN-ÊTRE ET APPRENTISSAGE (ANALYSE EXPLORATOIRE)
+# ==============================================================================
+
+
+# 1. Définition des variables pour cette sous-partie
+vars_bien_etre <- c("LIFESAT", "FEELLAH", "SDLEFF", "PROBSELF")
+vars_apprentissage <- c("MATHEFF", "MATHEF21", "EXPOFA", "EXPO21ST", "COGACRCO", "COGACMCO")
+
+# 2. Création d'un sous-tableau dédié à la partie III.1
+# On s'assure que les données sont bien numériques pour les corrélations
+data_iii_1 <- donnees %>%
+  select(all_of(c(vars_bien_etre, vars_apprentissage))) %>%
+  mutate(across(everything(), as.numeric))
+
+# 3. Statistiques descriptives univariées (Corrigé)
+# Calcul des moyennes, écarts-types et % de valeurs manquantes avec l'arrondi intégré
+stats_desc <- data.frame(
+  Variable = names(data_iii_1),
+  Moyenne = round(sapply(data_iii_1, mean, na.rm = TRUE), 2),
+  Ecart_Type = round(sapply(data_iii_1, sd, na.rm = TRUE), 2),
+  Taux_NA_pct = round(sapply(data_iii_1, function(x) sum(is.na(x)) / length(x) * 100), 2)
+)
+
+print("--- Statistiques descriptives des variables (Partie III.1) ---")
+print(stats_desc)
+
+# 4. Calcul de la matrice de corrélation
+# Utilisation de pairwise.complete.obs pour gérer les NA intelligemment
+matrice_cor_iii_1 <- cor(data_iii_1, use = "pairwise.complete.obs")
+
+# 5. Visualisation : Matrice de corrélation (Graphique pour le rapport)
+# On utilise hclust pour bien faire apparaître les "blocs" (Bien-être vs Apprentissage)
+corrplot(matrice_cor_iii_1, 
+         method = "color", 
+         type = "upper", 
+         order = "hclust",       # Ordonnancement hiérarchique très visuel
+         addCoef.col = "black",  # Affiche les valeurs de corrélation
+         tl.col = "black",       # Couleur des labels
+         tl.srt = 45,            # Rotation des labels
+         diag = FALSE,           # Masque la diagonale (des 1)
+         number.cex = 0.7,       # Taille des nombres (à ajuster si besoin)
+         title = "Corrélations : Bien-être et Apprentissage des Mathématiques",
+         mar = c(0,0,2,0))       # Marge pour que le titre ne soit pas coupé
+```
+```{r}
+# ==============================================================================
+# PARTIE III.1 : BIEN-ÊTRE ET APPRENTISSAGE (Mise à jour avec libellés)
+# ==============================================================================
+
+
+# 1. Création d'un dictionnaire pour traduire les variables
+dico_libelles <- c(
+  "LIFESAT" = "Students' Life Satisfaction across Domains",
+  "FEELLAH" = "Feelings about learning at home", 
+  "SDLEFF" = "Self-directed learning self-efficacy",
+  "PROBSELF" = "Problems with self-directed learning",
+  "MATHEFF" = "Maths self-efficacy: formal and applied",
+  "MATHEF21" = "Maths self-efficacy: reasoning & 21st century",
+  "EXPOFA" = "Exposure to Formal & Applied Maths",
+  "EXPO21ST" = "Exposure to Maths Reasoning & 21st century",
+  "COGACRCO" = "Cognitive activation: Foster reasoning",
+  "COGACMCO" = "Cognitive activation: Encourage math thinking"
+)
+
+# On a légèrement raccourci les libellés (enlevé les "(WLE)" et détails de 2022) 
+# pour éviter que le graphique ne devienne illisible.
+
+# 2. Création du sous-tableau
+vars_bien_etre <- c("LIFESAT", "FEELLAH", "SDLEFF", "PROBSELF")
+vars_apprentissage <- c("MATHEFF", "MATHEF21", "EXPOFA", "EXPO21ST", "COGACRCO", "COGACMCO")
+
+data_iii_1 <- donnees %>%
+  select(all_of(c(vars_bien_etre, vars_apprentissage))) %>%
+  mutate(across(everything(), as.numeric))
+
+# 3. Statistiques descriptives univariées avec la colonne Signification
+stats_desc <- data.frame(
+  Variable = names(data_iii_1),
+  Signification = dico_libelles[names(data_iii_1)], # Ajout de la signification
+  Moyenne = round(sapply(data_iii_1, mean, na.rm = TRUE), 2),
+  Ecart_Type = round(sapply(data_iii_1, sd, na.rm = TRUE), 2),
+  Taux_NA_pct = round(sapply(data_iii_1, function(x) sum(is.na(x)) / length(x) * 100), 2)
+)
+# On supprime le nom des lignes (qui duplique la variable) pour faire propre
+rownames(stats_desc) <- NULL 
+
+print("--- Statistiques descriptives des variables (Partie III.1) ---")
+print(stats_desc)
+
+# 4. Calcul de la matrice de corrélation
+matrice_cor_iii_1 <- cor(data_iii_1, use = "pairwise.complete.obs")
+
+# 5. Remplacement des noms de la matrice par les libellés compréhensibles
+rownames(matrice_cor_iii_1) <- dico_libelles[rownames(matrice_cor_iii_1)]
+colnames(matrice_cor_iii_1) <- dico_libelles[colnames(matrice_cor_iii_1)]
+
+# 6. Visualisation : Matrice de corrélation
+# Si le texte déborde encore dans l'onglet "Plots", cliquez sur "Zoom" dans RStudio
+corrplot(matrice_cor_iii_1, 
+         method = "color", 
+         type = "upper", 
+         order = "hclust",       
+         addCoef.col = "black",  
+         tl.col = "black",       
+         tl.srt = 45,            
+         diag = FALSE,           
+         number.cex = 0.6,       # On réduit un peu la taille des chiffres
+         tl.cex = 0.6,           # CRUCIAL : On réduit la taille du texte pour les longs noms
+         title = "Corrélations : Bien-être et Apprentissage des Mathématiques",
+         mar = c(0,0,2,0))
+
+
+# 1. Créer le fichier image (ici en format PNG, avec une bonne résolution)
+# Vous pouvez modifier le nom "matrice_correlation.png" comme vous le souhaitez
+png(filename = "matrice_correlation.png", width = 1000, height = 800, res = 120)
+
+# 2. Générer le graphique (R va le dessiner directement dans le fichier PNG)
+corrplot(matrice_cor_iii_1, 
+         method = "color", 
+         type = "upper", 
+         order = "hclust",       
+         addCoef.col = "black",  
+         tl.col = "black",       
+         tl.srt = 45,            
+         diag = FALSE,           
+         number.cex = 0.6,       
+         tl.cex = 0.6,           
+         title = "Corrélations : Bien-être et Apprentissage des Mathématiques",
+         mar = c(0,0,2,0)) 
+
+# 3. Fermer le fichier pour sauvegarder l'image (Étape CRUCIALE !)
+dev.off()
+```
+

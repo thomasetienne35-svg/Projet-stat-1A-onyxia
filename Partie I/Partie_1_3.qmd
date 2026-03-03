@@ -1,0 +1,118 @@
+---
+title: "Partie_1_3"
+format: html
+---
+```{r}
+donnees <- readRDS("donnees_PS_triees.rds")
+```
+ 
+```{r}
+
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+```
+ 
+
+```{r}
+# ==============================================================================
+# PARTIE I.3 : VÉCU DU DISTANCIEL ET DIFFÉRENCES
+# ==============================================================================
+
+
+# 1. Définition des variables
+vars_vecu <- c("ST354Q01JA", "ST354Q04JA", "ST354Q05JA", "ST354Q06JA")
+vars_perception <- c("FEELLAH", "SDLEFF", "PROBSELF")
+
+data_i3 <- donnees %>%
+  select(all_of(c(vars_vecu, vars_perception))) %>%
+  mutate(across(all_of(vars_perception), as.numeric))
+
+# 2. STATISTIQUES DESCRIPTIVES : Indices de perception (WLE)
+stats_perception <- data_i3 %>%
+  select(all_of(vars_perception)) %>%
+  summarise(across(everything(), list(
+    Moyenne = ~round(mean(.x, na.rm = TRUE), 2),
+    Ecart_Type = ~round(sd(.x, na.rm = TRUE), 2),
+    Taux_NA_pct = ~round(sum(is.na(.x))/n()*100, 2)
+  ))) %>%
+  pivot_longer(everything(), names_to = c("Variable", ".value"), names_pattern = "(.*)_(.*)")
+
+print("--- 1. Statistiques Perception de l'apprentissage (WLE) ---")
+print(stats_perception)
+
+# 3. STATISTIQUES DESCRIPTIVES : Vécu du distanciel (Ex: Solitude)
+freq_solitude <- data_i3 %>%
+  filter(!is.na(ST354Q01JA)) %>%
+  count(ST354Q01JA) %>%
+  mutate(Pourcentage = round(n / sum(n) * 100, 1))
+
+print("--- 2. Fréquences Solitude (ST354Q01JA) ---")
+print(freq_solitude)
+# Note : Vous pouvez remplacer ST354Q01JA par ST354Q04JA pour voir l'anxiété !
+
+# 4. GRAPHIQUE BIVARIÉ : Croisement entre vécu et perception
+# Création d'un Boxplot : Efficacité perçue (SDLEFF) selon la Motivation (ST354Q05JA)
+data_graph <- data_i3 %>%
+  filter(!is.na(ST354Q05JA) & !is.na(SDLEFF)) %>%
+  mutate(Motivation = as.factor(ST354Q05JA)) # Transformé en catégorie pour le graphique
+
+plot_i3 <- ggplot(data_graph, aes(x = Motivation, y = SDLEFF, fill = Motivation)) +
+  geom_boxplot(alpha = 0.8, outlier.alpha = 0.1) + # Les outliers sont mis en transparent
+  scale_fill_brewer(palette = "Blues") +
+  theme_minimal() +
+  labs(title = "Efficacité dans l'apprentissage autonome selon la motivation",
+       subtitle = "Comment la motivation (ST354Q05JA) influence l'efficacité perçue (SDLEFF)",
+       x = "Manque de motivation (1 = Pas d'accord, 4 = Tout à fait d'accord)",
+       y = "Score d'efficacité perçue (SDLEFF)") +
+  theme(legend.position = "none",
+        plot.title = element_text(face = "bold"))
+
+# Afficher le graphique
+print(plot_i3)
+
+# 5. Sauvegarder le graphique ggplot2 en haute résolution
+# Le graphique sauvegardé sera le dernier affiché (ou celui spécifié par "plot = plot_i3")
+ggsave(filename = "I_3_boxplot_motivation_efficacite.png", 
+       plot = plot_i3,       # On précise quel graphique on veut sauvegarder
+       width = 8,            # Largeur de l'image (en pouces)
+       height = 6,           # Hauteur de l'image (en pouces)
+       dpi = 300)            # Haute résolution (300 dpi = qualité impression pour un rapport)
+
+
+```
+
+```{r}
+# ==============================================================================
+# CALCUL DES VALEURS EXACTES POUR LA RÉDACTION DE LA PARTIE I.3
+# ==============================================================================
+
+# 1. Calcul du pourcentage d'élèves d'accord ou tout à fait d'accord sur la solitude (ST354Q01JA)
+# On suppose que 3 = "D'accord" et 4 = "Tout à fait d'accord"
+pourcentage_solitude <- data_i3 %>%
+  filter(!is.na(ST354Q01JA)) %>%
+  summarise(pct = sum(ST354Q01JA %in% c(3, 4)) / n() * 100) %>%
+  pull(pct)
+
+# 2. Calcul de la moyenne de l'efficacité autonome (SDLEFF)
+moyenne_sdleff <- mean(data_i3$SDLEFF, na.rm = TRUE)
+
+# 3. Calcul de l'écart-type de l'efficacité autonome (SDLEFF)
+ecart_type_sdleff <- sd(data_i3$SDLEFF, na.rm = TRUE)
+
+# ==============================================================================
+# AFFICHAGE DES RÉSULTATS À COPIER DANS LE TEXTE
+# ==============================================================================
+
+cat("\n--- VALEURS À INSÉRER DANS VOTRE RAPPORT ---\n\n")
+
+cat("1. Pourcentage d'élèves se sentant seuls : [", round(pourcentage_solitude, 1), "% ]\n")
+cat("   -> À insérer dans : '...[insérer le % calculé par R] % des élèves se déclarent...'\n\n")
+
+cat("2. Moyenne de SDLEFF : [", round(moyenne_sdleff, 2), "]\n")
+cat("   -> À insérer dans : '...affiche une moyenne de [insérer moyenne SDLEFF]...'\n\n")
+
+cat("3. Écart-type de SDLEFF : [", round(ecart_type_sdleff, 2), "]\n")
+cat("   -> À insérer dans : '...(écart-type : [insérer ET])...'\n\n")
+```
+
